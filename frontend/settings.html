@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — BugSense</title>
+  <meta name="description" content="Manage your BugSense preferences and application settings." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Fonts: same as the rest of BugSense -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Shared design tokens + base styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Shared dashboard shell (sidebar, topbar, panels, badges) -->
+  <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Settings-specific layout -->
+  <link rel="stylesheet" href="css/settings.css">
+</head>
+<body class="dash-body">
+
+  <div class="dash-shell">
+
+    <!-- Mobile sidebar backdrop -->
+    <div class="dash-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ============ SIDEBAR (same flat structure as every other page, plus a Settings item) ============ -->
+    <aside class="dash-sidebar" id="sidebar">
+      <div class="dash-sidebar__brand">
+        <span class="brand-mark__icon"><i class="bi bi-bug-fill"></i></span>
+        <span class="brand-mark__text">
+          <strong>BugSense</strong>
+          <small>AI Diagnosis Platform</small>
+        </span>
+        <button type="button" class="dash-sidebar__close d-lg-none" id="sidebarClose" aria-label="Close navigation">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <nav class="dash-nav">
+        <a href="dashboard.html" class="dash-nav__link">
+          <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+        </a>
+        <a href="bug-analyzer.html" class="dash-nav__link">
+          <i class="bi bi-bug"></i> <span>Bug Analyzer</span>
+        </a>
+        <a href="history.html" class="dash-nav__link">
+          <i class="bi bi-clock-history"></i> <span>Bug History</span>
+        </a>
+        <a href="knowledge-base.html" class="dash-nav__link">
+          <i class="bi bi-journal-code"></i> <span>Knowledge Base</span>
+        </a>
+        <a href="profile.html" class="dash-nav__link">
+          <i class="bi bi-person-circle"></i> <span>Profile</span>
+        </a>
+        <a href="settings.html" class="dash-nav__link active" aria-current="page">
+          <i class="bi bi-gear"></i> <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="dash-sidebar__footer">
+        <a href="index.html" class="dash-nav__link dash-nav__link--logout">
+          <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="dash-main">
+
+      <!-- ---------------- TOP HEADER (unchanged structure — identical to every other page) ---------------- -->
+      <header class="dash-topbar">
+        <div class="dash-topbar__left">
+          <button type="button" class="dash-hamburger d-lg-none" id="sidebarToggle" aria-label="Open navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <h1>Settings</h1>
+            <p>Manage your BugSense preferences and application settings.</p>
+          </div>
+        </div>
+
+        <div class="dash-topbar__right">
+          <a href="bug-analyzer.html" class="btn btn-accent settings-topbar-cta">
+            <i class="bi bi-plus-lg"></i> <span class="d-none d-sm-inline">Analyze New Bug</span>
+          </a>
+
+          <!-- Notifications -->
+<div class="dropdown">
+
+  <button
+    class="dash-icon-btn"
+    type="button"
+    id="notifBtn"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    aria-label="Notifications"
+  >
+    <i class="bi bi-bell"></i>
+  </button>
+
+  <ul
+    class="dropdown-menu dropdown-menu-end dash-dropdown"
+    aria-labelledby="notifBtn"
+  >
+    <li class="dash-dropdown__title">Notifications</li>
+
+    <li>
+      <div class="dash-dropdown__item">
+        <i class="bi bi-bell text-accent"></i>
+        <span>No notifications yet</span>
+      </div>
+    </li>
+
+  </ul>
+
+</div>
+
+          <!-- Profile -->
+          <div class="dropdown">
+            <button class="dash-profile" type="button" id="profileBtn" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="dash-avatar">PK</span>
+              <span class="dash-profile__name d-none d-md-inline">Praveen Kumar</span>
+              <i class="bi bi-chevron-down d-none d-md-inline"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dash-dropdown" aria-labelledby="profileBtn">
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="profile.html"><i class="bi bi-person"></i> <span>My Profile</span></a></li>
+              <li><hr class="dash-dropdown__divider"></li>
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="index.html"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <div
+  class="dash-content settings-data-loading"
+  id="settingsContent"
+>
+
+  <!-- Settings Loading State -->
+  <div
+    class="settings-loader"
+    id="settingsLoader"
+    role="status"
+    aria-live="polite"
+  >
+    <div class="settings-loader__spinner"></div>
+
+    <div class="settings-loader__text">
+      <strong>Loading settings</strong>
+      <span>Fetching your BugSense preferences...</span>
+    </div>
+  </div>
+
+  <!-- Real Settings Content -->
+  <div
+    class="settings-real-content"
+    id="settingsRealContent"
+  >
+
+    <form id="settingsForm">
+
+          <!-- ---------------- GENERAL SETTINGS ---------------- -->
+          <section class="panel settings-card">
+            <div class="panel__head">
+              <h2>General Settings</h2>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Language</span>
+                <span class="settings-row__desc">Choose the display language for BugSense.</span>
+              </div>
+              <div class="settings-row__control">
+                <select class="form-select" id="generalLanguage">
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Timezone</span>
+                <span class="settings-row__desc">Used to display bug timestamps and activity dates.</span>
+              </div>
+              <div class="settings-row__control">
+                <select class="form-select" id="generalTimezone">
+                  <option value="UTC">UTC</option>
+                  <option value="IST">India Standard Time (IST)</option>
+                  <option value="EST">Eastern Time (EST)</option>
+                  <option value="PST">Pacific Time (PST)</option>
+                  <option value="CET">Central European Time (CET)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Date Format</span>
+                <span class="settings-row__desc">Applies to dates shown across the dashboard.</span>
+              </div>
+              <div class="settings-row__control">
+                <select class="form-select" id="generalDateFormat">
+                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Auto Save</span>
+               <span class="settings-row__desc">
+  Save automatic draft handling as your preferred workflow setting.
+</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="generalAutoSave">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- APPEARANCE ---------------- -->
+          <section class="panel settings-card">
+            <div class="panel__head">
+              <h2>Appearance</h2>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Theme</span>
+                <span class="settings-row__desc">BugSense currently runs in dark mode. Other themes are saved as a preference for a future update.</span>
+              </div>
+              <div class="settings-row__control">
+                <select class="form-select" id="appearanceTheme">
+                  <option value="dark">Dark (Default)</option>
+                  <option value="light">Light</option>
+                  <option value="system">System</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+  <div class="settings-row__label">
+    <span class="settings-row__title">Compact Mode</span>
+    <span class="settings-row__desc">
+      Save compact layout as your preferred interface mode.
+    </span>
+  </div>
+
+  <div class="settings-row__control">
+    <div class="form-check form-switch settings-switch">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="appearanceCompactMode"
+      >
+    </div>
+  </div>
+</div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Animations</span>
+              <span class="settings-row__desc">
+  Save your preference for interface transitions and motion effects.
+</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="appearanceAnimations">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- NOTIFICATIONS ---------------- -->
+          <section class="panel settings-card">
+            <div class="panel__head">
+              <h2>Notifications</h2>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Analysis Completed</span>
+                <span class="settings-row__desc">Notify me when a bug analysis finishes running.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="notifAnalysisCompleted">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">New Knowledge Added</span>
+                <span class="settings-row__desc">Notify me when a new entry is added to the knowledge base.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="notifNewKnowledge">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Bug Analysis Alerts</span>
+                <span class="settings-row__desc">Notify me about critical or high-severity bug findings.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="notifBugAlerts">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">System Notifications</span>
+                <span class="settings-row__desc">Receive general platform updates and announcements.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="notifSystemNotifications">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- PRIVACY ---------------- -->
+          <section class="panel settings-card">
+            <div class="panel__head">
+              <h2>Privacy</h2>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Save Analysis History</span>
+                <span class="settings-row__desc">Keep a record of past bug analyses in your Bug History.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="privacySaveHistory">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Store Resolved Bugs</span>
+                <span class="settings-row__desc">Allow resolved bugs to be retained for future reference.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="privacyStoreResolved">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Usage Analytics</span>
+                <span class="settings-row__desc">Help improve BugSense by sharing anonymous usage data.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="privacyUsageAnalytics">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- AI & DIAGNOSIS ---------------- -->
+          <section class="panel settings-card">
+            <div class="panel__head">
+              <h2>AI &amp; Diagnosis</h2>
+              <span class="panel__tag">Preview</span>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">AI Suggestions</span>
+                <span class="settings-row__desc">Allow BugSense to suggest next steps during analysis.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="aiSuggestions">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Historical Knowledge Retrieval</span>
+                <span class="settings-row__desc">Use the knowledge base to find similar past issues.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="aiHistoricalRetrieval">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Automatic Root Cause Analysis</span>
+                <span class="settings-row__desc">Run root cause analysis automatically on every submission.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="aiRootCause">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row__label">
+                <span class="settings-row__title">Fix Recommendations</span>
+                <span class="settings-row__desc">Generate a recommended fix alongside every analysis result.</span>
+              </div>
+              <div class="settings-row__control">
+                <div class="form-check form-switch settings-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="aiFixRecommendations">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- ACTIONS ---------------- -->
+          <div class="settings-actions">
+            <button type="button" class="btn btn-ghost" id="resetSettingsBtn">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset to Default
+            </button>
+            <button type="submit" class="btn btn-accent" id="saveSettingsBtn">
+              <i class="bi bi-check2"></i> Save Changes
+            </button>
+          </div>
+
+        </form>
+
+      <p class="dash-disclaimer">
+  <i class="bi bi-info-circle"></i>
+  Settings are saved to your BugSense account and restored automatically when you sign in.
+</p>
+
+  </div>
+  <!-- End Real Settings Content -->
+
+</div>
+</div>
+</div>
+
+  <!-- Toast container (dummy feedback) -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    <div id="settingsToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill" id="settingsToastIcon"></i>
+          <span id="settingsToastMessage">Success</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+ <!-- Bootstrap Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- BugSense Configuration -->
+<script src="js/config.js"></script>
+
+<!-- Shared dashboard shell behavior -->
+<script src="js/dashboard.js"></script>
+
+<!-- Authentication guard -->
+<script src="js/auth.js"></script>
+
+<!-- Settings-specific behavior -->
+<script src="js/settings.js"></script>
+
+</body>
+</html>

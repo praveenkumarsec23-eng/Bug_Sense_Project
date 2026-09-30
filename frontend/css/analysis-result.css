@@ -1,0 +1,682 @@
+/* ==========================================================================
+   BugSense — Analysis Result styles
+   Reuses tokens from css/style.css and the shell/panel/table/badge
+   components from css/dashboard.css. This file only adds the components
+   specific to this page (status strip, summary grid, agent results,
+   code blocks, confidence bars, similarity cells, resolution actions).
+   ========================================================================== */
+
+/* ---- Status strip ---- */
+
+.result-status-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.result-status-strip__left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.result-bug-id {
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.badge-complete {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: var(--success);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ---- Bug summary grid ---- */
+
+.result-summary-panel {
+  margin-bottom: 1rem;
+}
+
+.panel__head h2 {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.result-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem 1.5rem;
+}
+
+@media (max-width: 991.98px) {
+  .result-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .result-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.result-summary-grid__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.result-summary-grid__item--wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 575.98px) {
+  .result-summary-grid__item--wide {
+    grid-column: span 1;
+  }
+}
+
+.result-summary-grid__label {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.result-summary-grid__value {
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.badge-priority {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ---- Agent analysis ---- */
+
+.result-agents-panel {
+  margin-bottom: 1rem;
+}
+
+.agent-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.agent-result {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+}
+
+.agent-result__head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.55rem;
+}
+
+.agent-result__check {
+  color: var(--success);
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.agent-result__name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.agent-result__body {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.agent-result__body li {
+  position: relative;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.agent-result__body li::before {
+  content: "";
+  position: absolute;
+  left: -1.1rem;
+  top: 0.55em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ---- Key/value list (Severity Assessment, Failure Point) ---- */
+
+.kv-list {
+  margin: 0 0 1.1rem;
+}
+
+.kv-list__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.87rem;
+}
+
+.kv-list__row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.kv-list__row dt {
+  color: var(--text-faint);
+}
+
+.kv-list__row dd {
+  margin: 0;
+  color: var(--text);
+  text-align: right;
+}
+
+.result-explainer {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+/* ---- Code blocks ---- */
+
+.code-block {
+  margin: 0;
+  padding: 0.9rem 1.1rem;
+  background: #0a0f16;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+
+.code-block code {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  line-height: 1.6;
+  color: #ffd9a0;
+  white-space: pre;
+}
+
+/* ---- Root cause ---- */
+
+.result-root-cause-panel {
+  margin-bottom: 1rem;
+}
+
+.result-root-cause-panel__text {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  max-width: 780px;
+  margin: 0 0 1.25rem;
+}
+
+.confidence-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 420px;
+}
+
+.confidence-inline__label {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.confidence-inline__value {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.confidence-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+
+.confidence-bar--sm {
+  width: 70px;
+  flex: none;
+}
+
+.confidence-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #0fb8a0);
+}
+
+/* ---- Similar historical bugs ---- */
+
+.result-similar-panel {
+  margin-bottom: 1rem;
+}
+
+.similarity-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.result-collapse {
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.result-collapse__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0;
+}
+
+.result-collapse__toggle:hover {
+  color: var(--accent);
+}
+
+.result-collapse__toggle i {
+  transition: transform 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.result-collapse__toggle[aria-expanded="true"] i {
+  transform: rotate(90deg);
+}
+
+.result-collapse__text {
+  margin: 0.75rem 0 0;
+  color: var(--text-faint);
+  font-size: 0.83rem;
+  line-height: 1.6;
+  max-width: 720px;
+}
+
+/* ---- Recommended fix ---- */
+
+.result-fix-panel {
+  margin-bottom: 1rem;
+}
+
+.result-fix-panel__text {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 1.1rem;
+}
+
+.fix-diff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 767.98px) {
+  .fix-diff {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fix-diff__block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fix-diff__label {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+
+.fix-diff__block--before .fix-diff__label {
+  color: var(--danger);
+}
+
+.fix-diff__block--after .fix-diff__label {
+  color: var(--success);
+}
+
+.fix-diff__block--before .code-block {
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.fix-diff__block--after .code-block {
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.fix-diff__block--before .code-block code { color: #ffb3b3; }
+.fix-diff__block--after .code-block code { color: #a7f3d0; }
+
+.result-fix-panel__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.result-fix-panel__actions .btn.is-copied {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ---- Recommendation reasoning ---- */
+
+.result-reasoning {
+  border-top: 1px solid var(--border);
+  padding-top: 1.1rem;
+}
+
+.result-reasoning h3 {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+}
+
+.result-reasoning__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.result-reasoning__list li {
+  position: relative;
+  padding-left: 1.3rem;
+  color: var(--text-muted);
+  font-size: 0.87rem;
+}
+
+.result-reasoning__list li::before {
+  content: "\F633";
+  font-family: "bootstrap-icons";
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  color: var(--accent);
+  font-size: 0.75rem;
+}
+
+/* ---- Confidence summary ---- */
+
+.result-confidence-panel {
+  margin-bottom: 1.5rem;
+}
+
+.confidence-summary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.confidence-summary__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+/* ---- Resolution actions ---- */
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .result-actions {
+    flex-direction: column;
+  }
+  .result-actions .btn {
+    width: 100%;
+  }
+}
+
+/* ---- Shared ghost button (matches Bug Analyzer's secondary action style) ---- */
+
+.btn-ghost {
+  background: var(--surface-alt);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- Toast (matches Login/Register toast styling) ---- */
+
+#resultToast {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+#resultToastIcon {
+  color: var(--success);
+}
+
+#resultToast.toast--error #resultToastIcon {
+  color: var(--danger);
+}
+html,
+body {
+  overflow-anchor: none;
+}
+/* ==========================================================================
+   Analysis Result Loading / Real Data Reveal
+   Prevents demo/placeholder content from flashing before API data is ready.
+   ========================================================================== */
+
+#analysisResultContent {
+  position: relative;
+}
+
+/* Loader */
+.analysis-result-loader {
+  min-height: calc(100vh - 150px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.analysis-result-loader__spinner {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+
+  border: 3px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+
+  animation: analysisResultSpin 0.8s linear infinite;
+}
+
+.analysis-result-loader__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.analysis-result-loader__text strong {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.analysis-result-loader__text span {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+/* ----------------------------------------------------------
+   IMPORTANT:
+   Real API content must NEVER be visible during loading.
+   ---------------------------------------------------------- */
+
+.analysis-real-content {
+  display: none;
+}
+
+.analysis-data-loading .analysis-real-content {
+  display: none;
+}
+
+.analysis-data-loading .analysis-result-loader {
+  display: flex;
+}
+
+/* ----------------------------------------------------------
+   API finished successfully
+   ---------------------------------------------------------- */
+
+.analysis-data-ready .analysis-result-loader {
+  display: none;
+}
+
+.analysis-data-ready .analysis-real-content {
+  display: block;
+
+  animation: analysisResultFadeIn 0.2s ease both;
+}
+
+/* ----------------------------------------------------------
+   API error
+   ---------------------------------------------------------- */
+
+.analysis-data-error .analysis-real-content {
+  display: none;
+}
+
+.analysis-data-error .analysis-result-loader {
+  display: flex;
+  min-height: 320px;
+}
+
+.analysis-data-error .analysis-result-loader__spinner {
+  display: none;
+}
+
+.analysis-result-loader__error-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+
+  color: var(--danger);
+  font-size: 1rem;
+}
+
+/* ----------------------------------------------------------
+   Animations
+   ---------------------------------------------------------- */
+
+@keyframes analysisResultSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes analysisResultFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .analysis-result-loader__spinner {
+    animation: none;
+  }
+
+  .analysis-data-ready .analysis-real-content {
+    animation: none;
+  }
+}

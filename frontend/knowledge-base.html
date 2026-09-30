@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Knowledge Base — BugSense</title>
+  <meta name="description" content="Explore historical bugs, root causes, and proven resolutions on BugSense." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Fonts: same as the rest of BugSense -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Shared design tokens + base styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Shared dashboard shell (sidebar, topbar, panels, stat cards, badges, tables) -->
+  <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Knowledge Base-specific layout -->
+  <link rel="stylesheet" href="css/knowledge-base.css">
+</head>
+<body class="dash-body">
+
+  <div class="dash-shell">
+
+    <!-- Mobile sidebar backdrop -->
+    <div class="dash-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ============ SIDEBAR (unchanged — identical to every other page) ============ -->
+    <aside class="dash-sidebar" id="sidebar">
+      <div class="dash-sidebar__brand">
+        <span class="brand-mark__icon"><i class="bi bi-bug-fill"></i></span>
+        <span class="brand-mark__text">
+          <strong>BugSense</strong>
+          <small>AI Diagnosis Platform</small>
+        </span>
+        <button type="button" class="dash-sidebar__close d-lg-none" id="sidebarClose" aria-label="Close navigation">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <nav class="dash-nav">
+
+  <a href="dashboard.html" class="dash-nav__link">
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+  </a>
+
+  <a href="bug-analyzer.html" class="dash-nav__link">
+    <i class="bi bi-bug"></i>
+    <span>Bug Analyzer</span>
+  </a>
+
+<a href="history.html" class="dash-nav__link">
+  <i class="bi bi-clock-history"></i>
+  <span>Bug History</span>
+</a>
+
+<a href="knowledge-base.html" class="dash-nav__link active">
+  <i class="bi bi-journal-code"></i>
+  <span>Knowledge Base</span>
+</a>
+
+  <a href="profile.html" class="dash-nav__link">
+    <i class="bi bi-person-circle"></i>
+    <span>Profile</span>
+  </a>
+
+  <!-- Settings -->
+  <a href="settings.html" class="dash-nav__link">
+    <i class="bi bi-gear"></i>
+    <span>Settings</span>
+  </a>
+
+</nav>
+
+      <div class="dash-sidebar__footer">
+        <a href="index.html" class="dash-nav__link dash-nav__link--logout">
+          <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="dash-main">
+
+      <!-- ---------------- TOP HEADER (unchanged structure — identical to every other page) ---------------- -->
+      <header class="dash-topbar">
+        <div class="dash-topbar__left">
+          <button type="button" class="dash-hamburger d-lg-none" id="sidebarToggle" aria-label="Open navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <h1>Knowledge Base</h1>
+            <p>Explore historical bugs, root causes, and proven resolutions.</p>
+          </div>
+        </div>
+
+        <div class="dash-topbar__right">
+          <a href="bug-analyzer.html" class="btn btn-accent kb-topbar-cta">
+            <i class="bi bi-plus-lg"></i> <span class="d-none d-sm-inline">Analyze New Bug</span>
+          </a>
+
+          <!-- Notifications -->
+<div class="dropdown">
+
+  <button
+    class="dash-icon-btn"
+    type="button"
+    id="notifBtn"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    aria-label="Notifications"
+  >
+    <i class="bi bi-bell"></i>
+  </button>
+
+  <ul
+    class="dropdown-menu dropdown-menu-end dash-dropdown"
+    aria-labelledby="notifBtn"
+  >
+    <li class="dash-dropdown__title">Notifications</li>
+
+    <li>
+      <div class="dash-dropdown__item">
+        <i class="bi bi-bell text-accent"></i>
+        <span>No notifications yet</span>
+      </div>
+    </li>
+
+  </ul>
+
+</div>
+          <!-- Profile -->
+          <div class="dropdown">
+            <button class="dash-profile" type="button" id="profileBtn" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="dash-avatar">PK</span>
+              <span class="dash-profile__name d-none d-md-inline">Praveen Kumar</span>
+              <i class="bi bi-chevron-down d-none d-md-inline"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dash-dropdown" aria-labelledby="profileBtn">
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="profile.html"><i class="bi bi-person"></i> <span>My Profile</span></a></li>
+              <li><hr class="dash-dropdown__divider"></li>
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="index.html"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+     <div class="dash-content kb-data-loading" id="knowledgeBaseContent">
+
+  <!-- Knowledge Base Loading State -->
+  <div
+    class="kb-loader"
+    id="knowledgeBaseLoader"
+    role="status"
+    aria-live="polite"
+  >
+    <div class="kb-loader__spinner"></div>
+
+    <div class="kb-loader__text">
+      <strong>Loading knowledge base</strong>
+      <span>Fetching historical BugSense knowledge...</span>
+    </div>
+  </div>
+
+  <!-- Real Knowledge Base Content -->
+  <div
+    class="kb-real-content"
+    id="knowledgeBaseRealContent"
+  >
+
+  <!-- ---------------- INTRO PANEL ---------------- -->
+
+        <!-- ---------------- INTRO PANEL ---------------- -->
+        <section class="panel kb-intro-panel">
+          <div class="kb-intro-panel__icon"><i class="bi bi-journal-richtext"></i></div>
+          <div class="kb-intro-panel__body">
+            <span class="kb-eyebrow">Historical Defect Knowledge</span>
+            <h2>Learn from previously resolved bugs</h2>
+            <p>Search historical defects, root causes, and resolutions that can help developers diagnose similar issues faster.</p>
+          </div>
+        </section>
+
+        <!-- ---------------- STATISTICS ---------------- -->
+        <section class="dash-stats" aria-label="Knowledge base statistics">
+          <div class="stat-card">
+            <div class="stat-card__icon"><i class="bi bi-journal-code"></i></div>
+            <div class="stat-card__body">
+              <span class="stat-card__label">Knowledge Entries</span>
+              <span class="stat-card__value">138</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--success"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-card__body">
+              <span class="stat-card__label">Resolved Bugs</span>
+              <span class="stat-card__value">114</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--warn"><i class="bi bi-search"></i></div>
+            <div class="stat-card__body">
+              <span class="stat-card__label">Root Causes</span>
+              <span class="stat-card__value">86</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon"><i class="bi bi-lightbulb"></i></div>
+            <div class="stat-card__body">
+              <span class="stat-card__label">Fix Recommendations</span>
+              <span class="stat-card__value">121</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------- SEARCH + FILTERS ---------------- -->
+        <section class="panel kb-search-panel">
+          <div class="kb-search">
+            <i class="bi bi-search kb-search__icon"></i>
+            <input
+              type="search"
+              class="form-control kb-search__input"
+              id="kbSearchInput"
+              placeholder="Search bug ID, title, root cause, resolution, or keyword..."
+              aria-label="Search knowledge base">
+          </div>
+
+          <div class="kb-filters">
+            <div class="kb-filters__group">
+              <label for="kbFilterCategory" class="form-label">Category</label>
+              <select class="form-select" id="kbFilterCategory">
+                <option value="all" selected>All Categories</option>
+                <option value="Application Error">Application Error</option>
+                <option value="Database Error">Database Error</option>
+                <option value="Runtime Error">Runtime Error</option>
+                <option value="Performance">Performance</option>
+                <option value="API Error">API Error</option>
+                <option value="Security">Security</option>
+                <option value="Build Error">Build Error</option>
+              </select>
+            </div>
+
+           <div class="kb-filters__group">
+  <label for="kbFilterLanguage" class="form-label">Language</label>
+
+  <select class="form-select" id="kbFilterLanguage">
+    <option value="all" selected>All Languages</option>
+    <option value="java">Java</option>
+    <option value="python">Python</option>
+    <option value="javascript">JavaScript</option>
+    <option value="typescript">TypeScript</option>
+    <option value="c">C</option>
+    <option value="cpp">C++</option>
+    <option value="csharp">C#</option>
+    <option value="php">PHP</option>
+  </select>
+</div>
+
+            <div class="kb-filters__group">
+              <label for="kbFilterSeverity" class="form-label">Severity</label>
+              <select class="form-select" id="kbFilterSeverity">
+                <option value="all" selected>All Severities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+
+            <div class="kb-filters__group">
+              <label for="kbFilterSource" class="form-label">Source</label>
+              <select class="form-select" id="kbFilterSource">
+                <option value="all" selected>All Sources</option>
+                <option value="Resolved Bug">Resolved Bug</option>
+                <option value="Developer Resolution">Developer Resolution</option>
+                <option value="Best Practice">Best Practice</option>
+              </select>
+            </div>
+
+            <div class="kb-filters__group kb-filters__group--action">
+              <button type="button" class="btn btn-ghost" id="kbClearFiltersBtn">
+                <i class="bi bi-x-circle"></i> Clear Filters
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------- RESULT COUNT ---------------- -->
+        <p class="kb-result-count" id="kbResultCount" aria-live="polite">Showing 15 of 138 entries</p>
+
+        <!-- ---------------- HISTORICAL KNOWLEDGE TABLE ---------------- -->
+        <section class="panel kb-table-panel">
+          <div class="panel__head">
+            <div>
+              <h2>Historical Knowledge</h2>
+              <p class="kb-panel-sub">Previously resolved issues and reusable debugging knowledge.</p>
+            </div>
+           <span class="panel__tag">Database</span>
+          </div>
+
+          <div class="table-responsive dash-table-wrap">
+            <table class="dash-table" id="kbTable">
+              <thead>
+                <tr>
+                  <th>Knowledge ID</th>
+                  <th>Bug / Issue</th>
+                  <th>Category</th>
+                  <th>Language</th>
+                  <th>Severity</th>
+                  <th>Root Cause</th>
+                  <th>Relevance</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody id="kbTableBody">
+                <!-- Rows injected by knowledge-base.js -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty state -->
+          <div class="kb-empty" id="kbEmpty" hidden>
+            <i class="bi bi-search"></i>
+            <h3>No knowledge found</h3>
+            <p>Try changing your search or filters.</p>
+            <button type="button" class="btn btn-ghost" id="kbEmptyClearFiltersBtn">
+              <i class="bi bi-x-circle"></i> Clear Filters
+            </button>
+          </div>
+
+          <!-- Pagination -->
+          <nav class="kb-pagination" id="kbPagination" aria-label="Knowledge base pagination"></nav>
+        </section>
+
+        <!-- ---------------- RECENTLY ADDED KNOWLEDGE ---------------- -->
+        <section class="panel kb-recent-panel">
+          <div class="panel__head">
+            <div>
+              <h2>Recently Added Knowledge</h2>
+              <p class="kb-panel-sub">Latest resolved issues added to the historical knowledge base.</p>
+            </div>
+          </div>
+          <ul class="kb-recent-list" id="kbRecentList">
+            <!-- Items injected by knowledge-base.js -->
+          </ul>
+        </section>
+
+               <!-- ---------------- RAG INFORMATION PANEL ---------------- -->
+        <section class="panel kb-rag-panel">
+          <div class="kb-rag-panel__body">
+            <span class="kb-eyebrow">Semantic Knowledge Retrieval</span>
+
+            <h2>Historical knowledge for smarter diagnosis</h2>
+
+            <p>
+              Resolved bugs and their solutions become reusable historical knowledge.
+              BugSense uses embedding-based semantic retrieval to compare new bugs with
+              previous issues and provide relevant context for duplicate detection,
+              root-cause analysis, and fix recommendations.
+            </p>
+          </div>
+
+          <a href="bug-analyzer.html" class="btn btn-accent">
+            <i class="bi bi-bug"></i>
+            Analyze a Bug
+          </a>
+        </section>
+
+        <p class="dash-disclaimer">
+          <i class="bi bi-info-circle"></i>
+          Knowledge records and statistics are loaded from the BugSense database.
+          Semantic similarity is calculated dynamically when a new bug is analyzed,
+          so relevance scores may vary depending on the submitted bug context.
+        </p>
+          </div>
+  <!-- End Real Knowledge Base Content -->
+
+</div>
+</div>
+</div>
+
+  <!-- ---------------- KNOWLEDGE DETAILS MODAL ---------------- -->
+  <div class="modal fade" id="kbDetailsModal" tabindex="-1" aria-labelledby="kbDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content kb-modal">
+        <div class="modal-header">
+          <h5 class="modal-title" id="kbDetailsModalLabel">Knowledge Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <dl class="kv-list">
+            <div class="kv-list__row">
+              <dt>Knowledge ID</dt>
+              <dd class="mono" id="modalKbId">—</dd>
+            </div>
+            <div class="kv-list__row">
+              <dt>Status</dt>
+              <dd id="modalKbStatus">—</dd>
+            </div>
+            <div class="kv-list__row">
+              <dt>Title</dt>
+              <dd id="modalKbTitle">—</dd>
+            </div>
+            <div class="kv-list__row">
+              <dt>Bug ID</dt>
+              <dd class="mono" id="modalKbBugId">—</dd>
+            </div>
+            <div class="kv-list__row">
+              <dt>Category</dt>
+              <dd id="modalKbCategory">—</dd>
+            </div>
+            <div class="kv-list__row">
+              <dt>Language</dt>
+              <dd id="modalKbLanguage">—</dd>
+            </div>
+            <div class="kv-list__row">
+              <dt>Severity</dt>
+              <dd id="modalKbSeverity">—</dd>
+            </div>
+            <div class="kv-list__row">
+              <dt>Source</dt>
+              <dd id="modalKbSource">—</dd>
+            </div>
+          </dl>
+
+          <div class="kb-modal__section">
+            <span class="kb-modal__label">Error</span>
+            <pre class="code-block"><code id="modalKbError">—</code></pre>
+          </div>
+          <div class="kb-modal__section">
+            <span class="kb-modal__label">Root Cause</span>
+            <p id="modalKbRootCause">—</p>
+          </div>
+          <div class="kb-modal__section">
+            <span class="kb-modal__label">Resolution</span>
+            <p id="modalKbResolution">—</p>
+          </div>
+          <div class="kb-modal__section">
+            <span class="kb-modal__label">Why It Is Relevant</span>
+            <p id="modalKbWhyRelevant">—</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Close</button>
+          <a href="bug-analyzer.html" class="btn btn-accent" id="modalAnalyzeSimilarBtn">
+            Analyze Similar Bug <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container (dummy feedback) -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    <div id="kbToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill" id="kbToastIcon"></i>
+          <span id="kbToastMessage">Success</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+ <!-- Bootstrap Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- BugSense Configuration -->
+<script src="js/config.js"></script>
+
+<!-- Authentication -->
+<script src="js/auth.js"></script>
+
+<!-- Shared dashboard behavior -->
+<script src="js/dashboard.js"></script>
+
+<!-- Knowledge Base behavior -->
+<script src="js/knowledge-base.js"></script>
+
+</body>
+</html>

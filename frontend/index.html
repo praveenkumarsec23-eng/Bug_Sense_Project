@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Intelligent Bug Diagnosis Platform</title>
+  <meta name="description" content="Login or create an account for the Intelligent Bug Diagnosis Platform with Fix Recommendation Assistance." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Fonts: Space Grotesk (display), Inter (body), JetBrains Mono (code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Toast container (dummy feedback) -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    <div id="authToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill" id="toastIcon"></i>
+          <span id="toastMessage">Success</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-page">
+    <div class="auth-grid">
+
+      <!-- ============ LEFT: BRAND / DIAGNOSTIC PANEL ============ -->
+      <aside class="brand-panel">
+        <div class="brand-panel__glow"></div>
+        <div class="brand-panel__content">
+
+          <div class="brand-mark">
+            <span class="brand-mark__icon"><i class="bi bi-bug-fill"></i></span>
+            <span class="brand-mark__text">
+              <strong>BugSense</strong>
+              <small>AI Diagnosis Platform</small>
+            </span>
+          </div>
+
+          <h1 class="brand-headline">
+            Find the bug.<br>
+            Understand the fix.<br>
+            <span class="text-accent">Ship with confidence.</span>
+          </h1>
+          <p class="brand-subtext">
+            An intelligent diagnosis engine that reads your stack traces, isolates the
+            root cause, and recommends a fix — before it slows your team down.
+          </p>
+
+          <!-- Signature element: live diagnostic console mockup -->
+          <div class="code-window" aria-hidden="true">
+            <div class="code-window__header">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--amber"></span>
+              <span class="dot dot--green"></span>
+              <span class="code-window__title">traceback_analysis.py</span>
+              <span class="code-window__badge"><i class="bi bi-cpu"></i> AI scan</span>
+            </div>
+            <div class="code-window__body">
+              <pre><code><span class="ln">12</span><span class="code-text">def calculate_total(items):</span>
+<span class="ln">13</span><span class="code-text">    total = 0</span>
+<span class="ln">14</span><span class="code-text">    for item in items:</span>
+<span class="ln ln--bug">15</span><span class="code-text code-text--bug">        total += item.price * item.qty<span class="bug-flag"><i class="bi bi-bug-fill"></i> NoneType</span></span>
+<span class="ln">16</span><span class="code-text">    return total</span></code></pre>
+              <div class="scan-line"></div>
+            </div>
+            <div class="code-window__status">
+              <span class="status-dot"></span>
+              <span id="scanStatusText">Analyzing traceback…</span>
+            </div>
+          </div>
+
+          <ul class="brand-features list-unstyled">
+            <li>
+              <span class="brand-features__icon"><i class="bi bi-search"></i></span>
+              <div>
+                <strong>Root-cause detection</strong>
+                <small>Pinpoints the exact line and reason behind a failure</small>
+              </div>
+            </li>
+            <li>
+              <span class="brand-features__icon"><i class="bi bi-lightbulb"></i></span>
+              <div>
+                <strong>Fix recommendations</strong>
+                <small>Actionable, context-aware suggestions — not guesses</small>
+              </div>
+            </li>
+            <li>
+              <span class="brand-features__icon"><i class="bi bi-clock-history"></i></span>
+              <div>
+                <strong>Full bug history</strong>
+                <small>Track every diagnosis your team has ever run</small>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- ============ RIGHT: LOGIN / REGISTER FORM ============ -->
+      <main class="form-panel">
+        <div class="form-panel-inner">
+
+          <!-- Compact brand mark for small screens -->
+          <div class="brand-mobile d-lg-none">
+            <span class="brand-mark__icon"><i class="bi bi-bug-fill"></i></span>
+            <span><strong>BugSense</strong> · AI Diagnosis Platform</span>
+          </div>
+
+          <!-- Segmented Login / Register switcher -->
+          <div class="segmented" role="tablist" aria-label="Choose authentication mode">
+            <button type="button" class="segment active" id="tabLoginBtn" role="tab" aria-selected="true" aria-controls="loginForm">
+              Log In
+            </button>
+            <button type="button" class="segment" id="tabRegisterBtn" role="tab" aria-selected="false" aria-controls="registerForm">
+              Create Account
+            </button>
+          </div>
+
+          <!-- ---------------- LOGIN FORM ---------------- -->
+          <form id="loginForm" class="auth-form active" novalidate>
+            <div class="auth-form__head">
+              <h2>Welcome back</h2>
+              <p>Sign in to continue diagnosing bugs.</p>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required>
+              <label for="loginEmail">Email address</label>
+              <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+
+            <div class="form-floating password-field mb-2">
+              <input type="password" class="form-control" id="loginPassword" placeholder="Password" minlength="6" required>
+              <label for="loginPassword">Password</label>
+              <button type="button" class="password-toggle" data-target="loginPassword" aria-label="Show password">
+                <i class="bi bi-eye"></i>
+              </button>
+              <div class="invalid-feedback">Password must be at least 6 characters.</div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4 auth-form__meta">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">Remember me</label>
+              </div>
+              <span class="link-muted">Forgot password?</span>
+            </div>
+
+            <button type="submit" class="btn btn-accent w-100">
+              Log In <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+
+            <p class="auth-form__switch">
+              New to BugSense?
+              <button type="button" class="link-accent" id="goToRegister">Create an account</button>
+            </p>
+          </form>
+
+          <!-- ---------------- REGISTER FORM ---------------- -->
+          <form id="registerForm" class="auth-form" novalidate>
+            <div class="auth-form__head">
+              <h2>Create your account</h2>
+              <p>Start getting AI-powered fix recommendations.</p>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="registerName" placeholder="Full name" required>
+              <label for="registerName">Full name</label>
+              <div class="invalid-feedback">Please enter your full name.</div>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="email" class="form-control" id="registerEmail" placeholder="you@example.com" required>
+              <label for="registerEmail">Email address</label>
+              <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+
+            <div class="form-floating password-field mb-2">
+              <input type="password" class="form-control" id="registerPassword" placeholder="Password" minlength="8" required>
+              <label for="registerPassword">Password</label>
+              <button type="button" class="password-toggle" data-target="registerPassword" aria-label="Show password">
+                <i class="bi bi-eye"></i>
+              </button>
+              <div class="invalid-feedback">Password must be at least 8 characters.</div>
+            </div>
+
+            <div class="strength-meter mb-3" id="strengthMeter" aria-hidden="true">
+              <div class="strength-meter__bars">
+                <span></span><span></span><span></span>
+              </div>
+              <small id="strengthLabel">Signal weak</small>
+            </div>
+
+            <div class="form-floating password-field mb-3">
+              <input type="password" class="form-control" id="registerConfirmPassword" placeholder="Confirm password" required>
+              <label for="registerConfirmPassword">Confirm password</label>
+              <button type="button" class="password-toggle" data-target="registerConfirmPassword" aria-label="Show password">
+                <i class="bi bi-eye"></i>
+              </button>
+              <div class="invalid-feedback" id="confirmFeedback">Passwords do not match.</div>
+            </div>
+
+            <div class="form-check mb-4 auth-form__meta">
+              <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+              <label class="form-check-label" for="agreeTerms">
+             I agree to the <span class="link-muted">Terms of Service</span> and <span class="link-muted">Privacy Policy</span>
+              </label>
+              <div class="invalid-feedback">You must agree before continuing.</div>
+            </div>
+
+            <button type="submit" class="btn btn-accent w-100">
+              Create Account <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+
+            <p class="auth-form__switch">
+              Already have an account?
+              <button type="button" class="link-accent" id="goToLogin">Log in</button>
+            </p>
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+ <!-- BugSense Configuration -->
+<script src="js/config.js"></script>
+
+
+  <!-- Custom JS -->
+  <script src="js/login.js"></script>
+</body>
+</html>

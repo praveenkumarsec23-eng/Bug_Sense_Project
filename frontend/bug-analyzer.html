@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bug Analyzer — BugSense</title>
+  <meta name="description" content="Submit a bug, error log, stack trace, or source file to BugSense for intelligent diagnosis." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Fonts: same as Login/Register and Dashboard pages -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Shared design tokens + base styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Shared dashboard shell (sidebar, topbar, panels, pipeline, badges) -->
+  <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Bug Analyzer-specific layout -->
+  <link rel="stylesheet" href="css/bug-analyzer.css">
+</head>
+<body class="dash-body">
+
+  <div class="dash-shell">
+
+    <!-- Mobile sidebar backdrop -->
+    <div class="dash-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="dash-sidebar" id="sidebar">
+      <div class="dash-sidebar__brand">
+        <span class="brand-mark__icon"><i class="bi bi-bug-fill"></i></span>
+        <span class="brand-mark__text">
+          <strong>BugSense</strong>
+          <small>AI Diagnosis Platform</small>
+        </span>
+        <button type="button" class="dash-sidebar__close d-lg-none" id="sidebarClose" aria-label="Close navigation">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+<nav class="dash-nav">
+
+  <a href="dashboard.html" class="dash-nav__link">
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+  </a>
+
+  <a href="bug-analyzer.html" class="dash-nav__link active">
+    <i class="bi bi-bug"></i>
+    <span>Bug Analyzer</span>
+  </a>
+
+  <a href="history.html" class="dash-nav__link">
+    <i class="bi bi-clock-history"></i>
+    <span>Bug History</span>
+  </a>
+
+  <a href="knowledge-base.html" class="dash-nav__link">
+    <i class="bi bi-journal-code"></i>
+    <span>Knowledge Base</span>
+  </a>
+
+  <a href="profile.html" class="dash-nav__link">
+    <i class="bi bi-person-circle"></i>
+    <span>Profile</span>
+  </a>
+
+  <!-- Settings -->
+  <a href="settings.html" class="dash-nav__link">
+    <i class="bi bi-gear"></i>
+    <span>Settings</span>
+  </a>
+
+</nav>
+
+      <div class="dash-sidebar__footer">
+        <a href="index.html" class="dash-nav__link dash-nav__link--logout">
+          <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="dash-main">
+
+      <!-- ---------------- TOP HEADER ---------------- -->
+      <header class="dash-topbar">
+        <div class="dash-topbar__left">
+          <button type="button" class="dash-hamburger d-lg-none" id="sidebarToggle" aria-label="Open navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <h1>Bug Analyzer</h1>
+            <p>Submit a bug, error log, stack trace, or source file for intelligent diagnosis.</p>
+          </div>
+        </div>
+
+        <div class="dash-topbar__right">
+         <!-- Notifications -->
+<div class="dropdown">
+
+  <button
+    class="dash-icon-btn"
+    type="button"
+    id="notifBtn"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    aria-label="Notifications"
+  >
+    <i class="bi bi-bell"></i>
+  </button>
+
+  <ul
+    class="dropdown-menu dropdown-menu-end dash-dropdown"
+    aria-labelledby="notifBtn"
+  >
+    <li class="dash-dropdown__title">Notifications</li>
+
+    <li>
+      <div class="dash-dropdown__item">
+        <i class="bi bi-bell text-accent"></i>
+        <span>No notifications yet</span>
+      </div>
+    </li>
+
+  </ul>
+
+</div>
+
+          <!-- Profile -->
+          <div class="dropdown">
+            <button class="dash-profile" type="button" id="profileBtn" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="dash-avatar">PK</span>
+              <span class="dash-profile__name d-none d-md-inline">Praveen Kumar</span>
+              <i class="bi bi-chevron-down d-none d-md-inline"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dash-dropdown" aria-labelledby="profileBtn">
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="profile.html"><i class="bi bi-person"></i> <span>My Profile</span></a></li>
+              <li><hr class="dash-dropdown__divider"></li>
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="index.html"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <div class="dash-content">
+
+        <form id="bugAnalyzerForm" novalidate>
+
+          <!-- ---------------- GENERAL FORM ALERT ---------------- -->
+          <div class="form-alert" id="formAlert" role="alert" aria-live="polite" hidden>
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span id="formAlertText">Please provide bug details or upload a file.</span>
+          </div>
+
+          <!-- ---------------- BUG SUBMISSION CARD ---------------- -->
+          <section class="panel bug-form-card">
+            <div class="panel__head">
+              <div>
+                <h3>Submit a Bug</h3>
+                <p class="bug-form-card__sub">Provide as much context as possible for a more accurate diagnosis.</p>
+              </div>
+              <span class="panel__tag">Live analysis</span>
+            </div>
+
+            <div class="row g-3">
+              <!-- Bug Title -->
+              <div class="col-12 col-md-8">
+                <label for="bugTitle" class="form-label">Bug Title <span class="req">*</span></label>
+                <input type="text" class="form-control" id="bugTitle" placeholder="e.g. NullPointerException in UserService" required>
+                <div class="invalid-feedback">Please enter a bug title.</div>
+              </div>
+
+              <!-- Programming Language -->
+              <div class="col-12 col-md-4">
+                <label for="programmingLanguage" class="form-label">Programming Language <span class="req">*</span></label>
+                <select class="form-select" id="programmingLanguage" required>
+                  <option value="" selected disabled>Select language</option>
+                  <option value="java">Java</option>
+                  <option value="python">Python</option>
+                  <option value="javascript">JavaScript</option>
+                  <option value="typescript">TypeScript</option>
+                  <option value="c">C</option>
+                  <option value="cpp">C++</option>
+                  <option value="csharp">C#</option>
+                  <option value="php">PHP</option>
+                  <option value="other">Other</option>
+                </select>
+                <div class="invalid-feedback">Please select a language.</div>
+              </div>
+
+              <!-- Bug Description -->
+              <div class="col-12">
+                <label for="bugDescription" class="form-label">Bug Description</label>
+                <textarea class="form-control" id="bugDescription" rows="4" placeholder="Describe what happened, what you expected to happen, and when the issue occurs..."></textarea>
+              </div>
+
+              <!-- Error Message -->
+              <div class="col-12">
+                <label for="errorMessage" class="form-label">Error Message</label>
+                <textarea class="form-control" id="errorMessage" rows="3" placeholder="Paste the error message here..."></textarea>
+              </div>
+
+              <!-- Stack Trace -->
+              <div class="col-12">
+                <label for="stackTrace" class="form-label">Stack Trace</label>
+                <textarea class="form-control code-textarea" id="stackTrace" rows="6" placeholder="Paste your stack trace here..."></textarea>
+              </div>
+
+              <!-- Source Code -->
+              <div class="col-12">
+                <label for="sourceCode" class="form-label">Source Code <span class="label-optional">(optional)</span></label>
+                <textarea class="form-control code-textarea" id="sourceCode" rows="6" placeholder="Paste the relevant source code here..."></textarea>
+                <small class="field-note">Only include the code relevant to the issue.</small>
+              </div>
+
+             <!-- File Upload -->
+<div class="col-12">
+  <label class="form-label">Upload Source File</label>
+
+  <p class="upload-sub">
+    Upload a source-code file to automatically load the code
+    and detect its programming language.
+  </p>
+
+  <div
+    class="upload-dropzone"
+    id="uploadDropzone"
+    role="button"
+    tabindex="0"
+    aria-label="Upload source file. Click to browse or drag and drop a file here."
+  >
+    <div class="upload-dropzone__icon">
+      <i class="bi bi-file-earmark-code"></i>
+    </div>
+
+    <p class="upload-dropzone__title">
+      Drop your source file here
+    </p>
+
+    <p class="upload-dropzone__or">
+      or
+    </p>
+
+    <span class="btn btn-ghost upload-dropzone__browse">
+      Browse Files
+    </span>
+
+    <p class="upload-dropzone__types">
+      Supported: .py .java .js .ts .c .cpp .cc .cxx .cs .php
+      &nbsp;•&nbsp; Maximum size: 1 MB
+    </p>
+
+    <input
+      type="file"
+      id="fileInput"
+      class="visually-hidden"
+      accept=".py,.java,.js,.ts,.c,.cpp,.cc,.cxx,.cs,.php"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+  </div>
+
+  <div
+    class="upload-error"
+    id="uploadError"
+    role="alert"
+    hidden
+  ></div>
+
+  <div
+    class="upload-file-preview"
+    id="uploadFilePreview"
+    hidden
+  >
+    <span class="upload-file-preview__icon">
+      <i class="bi bi-file-earmark-check-fill"></i>
+    </span>
+
+    <div class="upload-file-preview__info">
+      <span
+        class="upload-file-preview__name"
+        id="uploadFileName"
+      >
+        source-file.py
+      </span>
+
+      <span
+        class="upload-file-preview__size"
+        id="uploadFileSize"
+      >
+        Size: 0 KB
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="upload-file-preview__remove"
+      id="uploadFileRemove"
+      aria-label="Remove uploaded file"
+    >
+      <i class="bi bi-trash3"></i>
+      Remove
+    </button>
+  </div>
+</div>
+
+              <!-- Analysis Options -->
+              <div class="col-12">
+                <div class="analysis-options">
+                  <h4>Analysis Options</h4>
+                  <div class="analysis-options__grid">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="optRootCause" checked>
+                      <label class="form-check-label" for="optRootCause">Analyze Root Cause</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="optSimilarBugs" checked>
+                      <label class="form-check-label" for="optSimilarBugs">Search Similar Historical Bugs</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="optFixRecommendation" checked>
+                      <label class="form-check-label" for="optFixRecommendation">Generate Fix Recommendation</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="optDuplicateDetection" checked>
+                      <label class="form-check-label" for="optDuplicateDetection">Detect Duplicate Issues</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="bug-form-card__actions">
+              <button type="button" class="btn btn-ghost" id="clearFormBtn">
+                <i class="bi bi-arrow-counterclockwise"></i> Clear
+              </button>
+              <button type="submit" class="btn btn-accent" id="analyzeBtn">
+                Analyze Bug <i class="bi bi-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </section>
+
+          <!-- ---------------- ANALYSIS PIPELINE PREVIEW ---------------- -->
+          <section class="panel dash-pipeline-panel">
+            <div class="panel__head">
+              <h3>Analysis Pipeline</h3>
+              <span class="panel__tag">Multi-agent pipeline</span>
+            </div>
+            <p class="dash-pipeline-panel__desc">
+  Every submitted bug moves through five specialized analysis agents coordinated by the BugSense analysis pipeline.
+</p>
+
+            <div class="pipeline">
+              <div class="pipeline__node">
+                <span class="pipeline__icon"><i class="bi bi-funnel"></i></span>
+                <span class="pipeline__name">Triage Agent</span>
+                <span class="pipeline__desc">Classifies severity and priority.</span>
+              </div>
+              <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+              <div class="pipeline__node">
+                <span class="pipeline__icon"><i class="bi bi-file-earmark-text"></i></span>
+                <span class="pipeline__name">Log Analysis Agent</span>
+                <span class="pipeline__desc">Parses logs and identifies failure points.</span>
+              </div>
+              <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+              <div class="pipeline__node">
+                <span class="pipeline__icon"><i class="bi bi-search"></i></span>
+                <span class="pipeline__name">Root Cause Agent</span>
+                <span class="pipeline__desc">Determines probable causes using historical knowledge.</span>
+              </div>
+              <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+              <div class="pipeline__node">
+                <span class="pipeline__icon"><i class="bi bi-files"></i></span>
+                <span class="pipeline__name">Duplicate Detection Agent</span>
+                <span class="pipeline__desc">Searches previous bugs for similar issues.</span>
+              </div>
+              <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+              <div class="pipeline__node">
+                <span class="pipeline__icon"><i class="bi bi-tools"></i></span>
+                <span class="pipeline__name">Remediation Agent</span>
+                <span class="pipeline__desc">Recommends a suitable fix.</span>
+              </div>
+            </div>
+          </section>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------------- ANALYZE SIMULATION OVERLAY ---------------- -->
+  <div class="analyze-overlay" id="analyzeOverlay" hidden aria-live="polite">
+    <div class="analyze-overlay__card">
+      <div class="analyze-overlay__spinner" aria-hidden="true"></div>
+      <p class="analyze-overlay__status" id="analyzeStatusText">Preparing analysis…</p>
+
+      <ul class="analyze-overlay__agents">
+        <li>
+          <span class="analyze-overlay__agent-icon" id="agentIcon-triage"><i class="bi bi-circle"></i></span>
+          <span class="analyze-overlay__agent-name">Triage Agent</span>
+          <span class="badge-status" id="agentStatus-triage">Waiting</span>
+        </li>
+        <li>
+          <span class="analyze-overlay__agent-icon" id="agentIcon-logAnalysis"><i class="bi bi-circle"></i></span>
+          <span class="analyze-overlay__agent-name">Log Analysis Agent</span>
+          <span class="badge-status" id="agentStatus-logAnalysis">Waiting</span>
+        </li>
+        <li>
+          <span class="analyze-overlay__agent-icon" id="agentIcon-rootCause"><i class="bi bi-circle"></i></span>
+          <span class="analyze-overlay__agent-name">Root Cause Agent</span>
+          <span class="badge-status" id="agentStatus-rootCause">Waiting</span>
+        </li>
+        <li>
+          <span class="analyze-overlay__agent-icon" id="agentIcon-duplicate"><i class="bi bi-circle"></i></span>
+          <span class="analyze-overlay__agent-name">Duplicate Detection Agent</span>
+          <span class="badge-status" id="agentStatus-duplicate">Waiting</span>
+        </li>
+        <li>
+          <span class="analyze-overlay__agent-icon" id="agentIcon-remediation"><i class="bi bi-circle"></i></span>
+          <span class="analyze-overlay__agent-name">Remediation Agent</span>
+          <span class="badge-status" id="agentStatus-remediation">Waiting</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+<!-- Bootstrap Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- BugSense Configuration -->
+<script src="js/config.js"></script>
+
+<!-- Shared dashboard shell behavior -->
+<script src="js/dashboard.js"></script>
+
+<!-- Authentication -->
+<script src="js/auth.js"></script>
+
+<!-- Bug Analyzer-specific behavior -->
+<script src="js/bug-analyzer.js"></script>
+</body>
+</html>

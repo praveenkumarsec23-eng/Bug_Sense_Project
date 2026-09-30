@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — BugSense</title>
+  <meta name="description" content="BugSense dashboard — overview of bug analysis activity, severity breakdown, and the AI diagnosis pipeline." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Fonts: same as Login/Register page -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Shared design tokens + base styles (same file used by the Login/Register page) -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Dashboard-specific layout -->
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dash-body">
+
+  <div class="dash-shell">
+
+    <!-- Mobile sidebar backdrop -->
+    <div class="dash-backdrop" id="sidebarBackdrop"></div>
+
+   <!-- ============ SIDEBAR ============ -->
+<aside class="dash-sidebar" id="sidebar">
+
+  <div class="dash-sidebar__brand">
+
+    <span class="brand-mark__icon">
+      <i class="bi bi-bug-fill"></i>
+    </span>
+
+    <span class="brand-mark__text">
+      <strong>BugSense</strong>
+      <small>AI Diagnosis Platform</small>
+    </span>
+
+    <button
+      type="button"
+      class="dash-sidebar__close d-lg-none"
+      id="sidebarClose"
+      aria-label="Close navigation"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+  </div>
+
+
+  <nav class="dash-nav">
+
+    <!-- Dashboard -->
+    <a
+      href="dashboard.html"
+      class="dash-nav__link active"
+    >
+      <i class="bi bi-speedometer2"></i>
+      <span>Dashboard</span>
+    </a>
+
+
+    <!-- Bug Analyzer -->
+    <a
+      href="bug-analyzer.html"
+      class="dash-nav__link"
+    >
+      <i class="bi bi-bug"></i>
+      <span>Bug Analyzer</span>
+    </a>
+
+
+    <!-- Bug History -->
+    <a
+      href="history.html"
+      class="dash-nav__link"
+    >
+      <i class="bi bi-clock-history"></i>
+      <span>Bug History</span>
+    </a>
+
+
+    <!-- Knowledge Base -->
+    <a
+      href="knowledge-base.html"
+      class="dash-nav__link"
+    >
+      <i class="bi bi-journal-code"></i>
+      <span>Knowledge Base</span>
+    </a>
+
+
+    <!-- Profile -->
+    <a
+      href="profile.html"
+      class="dash-nav__link"
+    >
+      <i class="bi bi-person-circle"></i>
+      <span>Profile</span>
+    </a>
+
+
+    <!-- Settings -->
+    <a
+      href="settings.html"
+      class="dash-nav__link"
+    >
+      <i class="bi bi-gear"></i>
+      <span>Settings</span>
+    </a>
+
+  </nav>
+
+
+  <!-- Logout -->
+  <div class="dash-sidebar__footer">
+
+    <a
+      href="index.html"
+      class="dash-nav__link dash-nav__link--logout"
+    >
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </a>
+
+  </div>
+
+</aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="dash-main">
+
+      <!-- ---------------- TOP HEADER ---------------- -->
+      <header class="dash-topbar">
+        <div class="dash-topbar__left">
+          <button type="button" class="dash-hamburger d-lg-none" id="sidebarToggle" aria-label="Open navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <h1>Dashboard</h1>
+            <p>Monitor your bug analysis activity and resolution insights.</p>
+          </div>
+        </div>
+
+        <div class="dash-topbar__right">
+         <!-- Notifications -->
+<div class="dropdown">
+
+  <button
+    class="dash-icon-btn"
+    type="button"
+    id="notifBtn"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    aria-label="Notifications"
+  >
+    <i class="bi bi-bell"></i>
+  </button>
+
+  <ul
+    class="dropdown-menu dropdown-menu-end dash-dropdown"
+    aria-labelledby="notifBtn"
+  >
+    <li class="dash-dropdown__title">Notifications</li>
+
+    <li>
+      <div class="dash-dropdown__item">
+        <i class="bi bi-bell text-accent"></i>
+        <span>No notifications yet</span>
+      </div>
+    </li>
+
+  </ul>
+
+</div>
+
+          <!-- Profile -->
+          <div class="dropdown">
+            <button class="dash-profile" type="button" id="profileBtn" data-bs-toggle="dropdown" aria-expanded="false">
+             <span class="dash-avatar">U</span>
+              <span class="dash-profile__name d-none d-md-inline">User</span>
+              <i class="bi bi-chevron-down d-none d-md-inline"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dash-dropdown" aria-labelledby="profileBtn">
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="profile.html"><i class="bi bi-person"></i> <span>My Profile</span></a></li>
+              
+              <li><hr class="dash-dropdown__divider"></li>
+              <li><a class="dash-dropdown__item dash-dropdown__item--simple" href="index.html"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+<div class="dash-content dashboard-data-loading" id="dashboardContent">
+<!-- Dashboard Loading State -->
+<div class="dashboard-loader" id="dashboardLoader" role="status" aria-live="polite">
+  <div class="dashboard-loader__spinner"></div>
+
+  <div class="dashboard-loader__text">
+    <strong>Loading dashboard</strong>
+    <span>Fetching your latest BugSense data...</span>
+  </div>
+</div>
+
+<!-- Real Dashboard Content -->
+<div class="dashboard-real-content" id="dashboardRealContent">
+
+        <!-- ---------------- WELCOME ---------------- -->
+        <section class="dash-welcome">
+          <div>
+           <h2>Welcome back</h2>
+            <p>Analyze bugs, understand root causes, and find reliable fixes.</p>
+          </div>
+          <a href="bug-analyzer.html" class="btn btn-accent dash-welcome__cta">
+            <i class="bi bi-plus-lg"></i> Analyze New Bug
+          </a>
+        </section>
+
+        <!-- ---------------- SUMMARY CARDS ---------------- -->
+<section class="dash-stats" aria-label="Bug summary statistics">
+
+  <div class="stat-card">
+    <div class="stat-card__icon">
+      <i class="bi bi-bug-fill"></i>
+    </div>
+    <div class="stat-card__body">
+      <span class="stat-card__label">Total Bugs</span>
+      <span class="stat-card__value">—</span>
+      <span class="stat-card__trend stat-card__trend--flat">
+        <i class="bi bi-dash"></i> Loading
+      </span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card__icon stat-card__icon--warn">
+      <i class="bi bi-exclamation-circle"></i>
+    </div>
+    <div class="stat-card__body">
+      <span class="stat-card__label">Open Bugs</span>
+      <span class="stat-card__value">—</span>
+      <span class="stat-card__trend stat-card__trend--flat">
+        <i class="bi bi-dash"></i> Loading
+      </span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card__icon stat-card__icon--success">
+      <i class="bi bi-check-circle"></i>
+    </div>
+    <div class="stat-card__body">
+      <span class="stat-card__label">Resolved Bugs</span>
+      <span class="stat-card__value">—</span>
+      <span class="stat-card__trend stat-card__trend--flat">
+        <i class="bi bi-dash"></i> Loading
+      </span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card__icon stat-card__icon--danger">
+      <i class="bi bi-fire"></i>
+    </div>
+    <div class="stat-card__body">
+      <span class="stat-card__label">Critical Bugs</span>
+      <span class="stat-card__value">—</span>
+      <span class="stat-card__trend stat-card__trend--flat">
+        <i class="bi bi-dash"></i> Loading
+      </span>
+    </div>
+  </div>
+
+</section>
+        <!-- ---------------- MAIN GRID: TABLE + SEVERITY ---------------- -->
+<section class="dash-grid dash-grid--split">
+
+  <!-- Recent Bug Analyses -->
+  <div class="panel dash-table-panel">
+    <div class="panel__head">
+      <h3>Recent Bug Analyses</h3>
+      <span class="panel__tag">Loading</span>
+    </div>
+
+    <div class="table-responsive dash-table-wrap">
+      <table class="dash-table">
+        <thead>
+          <tr>
+            <th>Bug ID</th>
+            <th>Bug Title</th>
+            <th>Category</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td colspan="7" class="text-center py-4">
+              Loading recent bug analyses...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <a href="history.html" class="dash-panel-link">
+      View full bug history
+      <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+
+
+  <!-- Bug Severity Overview -->
+  <div class="panel dash-severity-panel">
+    <div class="panel__head">
+      <h3>Bug Severity Overview</h3>
+    </div>
+
+    <ul class="severity-list">
+
+      <!-- Critical -->
+      <li>
+        <div class="severity-list__row">
+          <span>
+            <i class="bi bi-square-fill sev-dot sev-dot--critical"></i>
+            Critical
+          </span>
+
+          <span class="severity-list__count">—</span>
+        </div>
+
+        <div class="dash-bar">
+          <div
+            class="dash-bar__fill dash-bar__fill--critical"
+            style="width: 0%;"
+          ></div>
+        </div>
+      </li>
+
+
+      <!-- High -->
+      <li>
+        <div class="severity-list__row">
+          <span>
+            <i class="bi bi-square-fill sev-dot sev-dot--high"></i>
+            High
+          </span>
+
+          <span class="severity-list__count">—</span>
+        </div>
+
+        <div class="dash-bar">
+          <div
+            class="dash-bar__fill dash-bar__fill--high"
+            style="width: 0%;"
+          ></div>
+        </div>
+      </li>
+
+
+      <!-- Medium -->
+      <li>
+        <div class="severity-list__row">
+          <span>
+            <i class="bi bi-square-fill sev-dot sev-dot--medium"></i>
+            Medium
+          </span>
+
+          <span class="severity-list__count">—</span>
+        </div>
+
+        <div class="dash-bar">
+          <div
+            class="dash-bar__fill dash-bar__fill--medium"
+            style="width: 0%;"
+          ></div>
+        </div>
+      </li>
+
+
+      <!-- Low -->
+      <li>
+        <div class="severity-list__row">
+          <span>
+            <i class="bi bi-square-fill sev-dot sev-dot--low"></i>
+            Low
+          </span>
+
+          <span class="severity-list__count">—</span>
+        </div>
+
+        <div class="dash-bar">
+          <div
+            class="dash-bar__fill dash-bar__fill--low"
+            style="width: 0%;"
+          ></div>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+
+</section>
+
+       <!-- ---------------- CATEGORY + ACTIVITY ---------------- -->
+<section class="dash-grid dash-grid--split-even">
+
+  <!-- Bug Category Overview -->
+  <div class="panel">
+    <div class="panel__head">
+      <h3>Bug Category Overview</h3>
+    </div>
+
+    <ul class="category-list">
+
+      <li>
+        <span class="category-list__icon">
+          <i class="bi bi-cpu"></i>
+        </span>
+        <span class="category-list__name">Runtime Error</span>
+        <span class="category-list__count">—</span>
+      </li>
+
+      <li>
+        <span class="category-list__icon">
+          <i class="bi bi-server"></i>
+        </span>
+        <span class="category-list__name">Database Error</span>
+        <span class="category-list__count">—</span>
+      </li>
+
+      <li>
+        <span class="category-list__icon">
+          <i class="bi bi-diagram-3"></i>
+        </span>
+        <span class="category-list__name">Logic Error</span>
+        <span class="category-list__count">—</span>
+      </li>
+
+      <li>
+        <span class="category-list__icon">
+          <i class="bi bi-shield-lock"></i>
+        </span>
+        <span class="category-list__name">Security</span>
+        <span class="category-list__count">—</span>
+      </li>
+
+      <li>
+        <span class="category-list__icon">
+          <i class="bi bi-speedometer"></i>
+        </span>
+        <span class="category-list__name">Performance</span>
+        <span class="category-list__count">—</span>
+      </li>
+
+      <li>
+        <span class="category-list__icon">
+          <i class="bi bi-code-slash"></i>
+        </span>
+        <span class="category-list__name">Syntax Error</span>
+        <span class="category-list__count">—</span>
+      </li>
+
+    </ul>
+  </div>
+
+
+  <!-- Recent Activity -->
+  <div class="panel">
+    <div class="panel__head">
+      <h3>Recent Activity</h3>
+    </div>
+
+    <ul class="activity-list">
+      <li>
+        <span class="activity-list__icon">
+          <i class="bi bi-arrow-repeat"></i>
+        </span>
+
+        <div>
+          <p>Loading recent activity...</p>
+          <small>Please wait</small>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+</section>
+
+        <!-- ---------------- AGENT PIPELINE ---------------- -->
+        <section class="panel dash-pipeline-panel">
+          <div class="panel__head">
+            <h3>Analysis Pipeline</h3>
+      <span class="panel__tag">Multi-agent pipeline</span>
+          </div>
+          <p class="dash-pipeline-panel__desc">
+  Every submitted bug moves through five specialized analysis agents coordinated by the BugSense analysis pipeline.
+          </p>
+
+          <div class="pipeline">
+            <div class="pipeline__node">
+              <span class="pipeline__icon"><i class="bi bi-funnel"></i></span>
+              <span class="pipeline__name">Triage Agent</span>
+              <span class="badge-status badge-status--ready">Ready</span>
+            </div>
+            <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+            <div class="pipeline__node">
+              <span class="pipeline__icon"><i class="bi bi-file-earmark-text"></i></span>
+              <span class="pipeline__name">Log Analysis Agent</span>
+              <span class="badge-status badge-status--ready">Ready</span>
+            </div>
+            <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+            <div class="pipeline__node">
+              <span class="pipeline__icon"><i class="bi bi-search"></i></span>
+              <span class="pipeline__name">Root Cause Agent</span>
+              <span class="badge-status badge-status--ready">Ready</span>
+            </div>
+            <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+            <div class="pipeline__node">
+              <span class="pipeline__icon"><i class="bi bi-files"></i></span>
+              <span class="pipeline__name">Duplicate Detection Agent</span>
+              <span class="badge-status badge-status--ready">Ready</span>
+            </div>
+            <span class="pipeline__connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+
+            <div class="pipeline__node">
+              <span class="pipeline__icon"><i class="bi bi-tools"></i></span>
+              <span class="pipeline__name">Remediation Agent</span>
+              <span class="badge-status badge-status--ready">Ready</span>
+            </div>
+          </div>
+        </section>
+<!-- ---------------- KNOWLEDGE BASE SUMMARY ---------------- -->
+<section class="panel dash-kb-panel">
+
+  <div class="dash-kb-panel__head">
+    <span class="brand-mark__icon">
+      <i class="bi bi-journal-code"></i>
+    </span>
+
+    <div>
+      <h3>Historical Knowledge Base</h3>
+      <p>
+        Historical bug resolutions help BugSense identify similar issues
+        and provide organization-specific recommendations.
+      </p>
+    </div>
+  </div>
+
+  <div class="dash-kb-panel__stats">
+
+    <div>
+      <span class="dash-kb-panel__value">—</span>
+      <span class="dash-kb-panel__label">Historical Bugs Indexed</span>
+    </div>
+
+    <div>
+      <span class="dash-kb-panel__value">—</span>
+      <span class="dash-kb-panel__label">Resolved Issues</span>
+    </div>
+
+    <div>
+      <span class="dash-kb-panel__value">—</span>
+      <span class="dash-kb-panel__label">Similar Bug Searches</span>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ---------------- DASHBOARD DISCLAIMER ---------------- -->
+<p class="dash-disclaimer">
+  <i class="bi bi-info-circle"></i>
+  Dashboard statistics and recent activity are loaded from your BugSense account data.
+</p>
+
+
+</div>
+<!-- /dashboard-real-content -->
+
+</div>
+<!-- /dash-content -->
+
+</div>
+<!-- /dash-main -->
+
+</div>
+<!-- /dash-shell -->
+
+
+<!-- Bootstrap Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- BugSense Configuration -->
+<script src="js/config.js"></script>
+
+<!-- Shared Authentication Guard -->
+<script src="js/auth.js"></script>
+
+<!-- Dashboard JS -->
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>

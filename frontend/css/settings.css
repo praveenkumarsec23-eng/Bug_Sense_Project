@@ -1,0 +1,347 @@
+/* ==========================================================================
+   BugSense — Settings page styles
+   Reuses tokens from css/style.css and the shell/panel components from
+   css/dashboard.css. Every rule below is scoped to a settings-* class —
+   nothing here touches the sidebar, topbar, or any bare tag selector,
+   so it cannot affect other pages.
+   ========================================================================== */
+
+/* ---- Topbar CTA (sized to sit inside the existing 38px-tall topbar row) ---- */
+
+.settings-topbar-cta {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+/* ---- Shared ghost button (matches every other BugSense page) ---- */
+
+.btn-ghost {
+  background: var(--surface-alt);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   Settings cards
+   ========================================================================== */
+
+.settings-card {
+  margin-bottom: 1.25rem;
+}
+
+.settings-card .panel__head h2 {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+/* ---- Settings row ---- */
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-card .settings-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-card .settings-row:first-of-type {
+  padding-top: 0;
+}
+
+.settings-row__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 460px;
+}
+
+.settings-row__title {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.settings-row__desc {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.settings-row__control {
+  flex-shrink: 0;
+  width: 220px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 575.98px) {
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .settings-row__label {
+    max-width: none;
+  }
+
+  .settings-row__control {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* ---- Select controls (scoped to Settings rows only) ---- */
+
+.settings-row__control .form-select {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  padding: 0.45rem 2.1rem 0.45rem 0.75rem;
+}
+
+.settings-row__control .form-select:focus {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(33, 224, 192, 0.15);
+}
+
+/* ---- Toggle switches (scoped to Settings rows only) ---- */
+
+.settings-switch {
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+}
+
+.settings-switch .form-check-input {
+  width: 2.6rem;
+  height: 1.4rem;
+  margin: 0;
+  background-color: var(--surface-alt);
+  border-color: var(--border-strong);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='%238b98ac'/%3E%3C/svg%3E");
+  cursor: pointer;
+}
+
+.settings-switch .form-check-input:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='%2304231d'/%3E%3C/svg%3E");
+}
+
+.settings-switch .form-check-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(33, 224, 192, 0.15);
+}
+
+/* ==========================================================================
+   Actions row (Save / Reset)
+   ========================================================================== */
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .settings-actions {
+    flex-direction: column-reverse;
+  }
+
+  .settings-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ---- Toast (matches every other BugSense page) ---- */
+
+#settingsToast {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+#settingsToastIcon {
+  color: var(--success);
+}
+
+#settingsToast.toast--error #settingsToastIcon {
+  color: var(--danger);
+}
+/* ==========================================================================
+   Settings Loading / Real Data Reveal
+   ========================================================================== */
+
+#settingsContent {
+  position: relative;
+}
+
+
+/* ---------------- Loader ---------------- */
+
+.settings-loader {
+  min-height: calc(100vh - 150px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.settings-loader__spinner {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+
+  border: 3px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+
+  animation: settingsLoaderSpin 0.8s linear infinite;
+}
+
+.settings-loader__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.settings-loader__text strong {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.settings-loader__text span {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+
+/* ---------------- Real Settings Content ---------------- */
+
+.settings-real-content {
+  display: none;
+}
+
+
+/* ---------------- Loading State ---------------- */
+
+.settings-data-loading .settings-real-content {
+  display: none;
+}
+
+.settings-data-loading .settings-loader {
+  display: flex;
+}
+
+
+/* ---------------- Ready State ---------------- */
+
+.settings-data-ready .settings-loader {
+  display: none;
+}
+
+.settings-data-ready .settings-real-content {
+  display: block;
+  animation: settingsContentFadeIn 0.2s ease both;
+}
+
+
+/* ---------------- Error State ---------------- */
+
+.settings-data-error .settings-real-content {
+  display: none;
+}
+
+.settings-data-error .settings-loader {
+  display: flex;
+  min-height: 320px;
+}
+
+.settings-data-error .settings-loader__spinner {
+  display: none;
+}
+
+.settings-loader__error-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+
+  color: var(--danger, #ff6b6b);
+  font-size: 1rem;
+}
+
+
+/* ---------------- Animations ---------------- */
+
+@keyframes settingsLoaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes settingsContentFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* ---------------- Reduced Motion ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .settings-loader__spinner {
+    animation: none;
+  }
+
+  .settings-data-ready .settings-real-content {
+    animation: none;
+  }
+}
