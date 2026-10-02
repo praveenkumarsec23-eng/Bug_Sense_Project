@@ -47,20 +47,20 @@ app.include_router(knowledge_router)
 # CORS CONFIGURATION
 # =========================================================
 
-# Allow only the BugSense frontend to communicate with the backend.
-# Both addresses are included because VS Code Live Server may use
-# either localhost or 127.0.0.1.
+# Allow BugSense frontend environments to communicate with the backend.
+# Local origins are used during development.
+# The Vercel origin is used by the deployed production frontend.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://127.0.0.1:5500",
-        "http://localhost:5500"
+        "http://localhost:5500",
+        "https://bugsenseproject-frontend.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 # =========================================================
 # ROOT API
