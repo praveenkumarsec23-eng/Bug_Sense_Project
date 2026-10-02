@@ -3,5 +3,5 @@
    ------------------------------------------------------------------------- */
 
 window.BUGSENSE_CONFIG = {
-  API_BASE: 'http://127.0.0.1:8000'
+  API_BASE: 'https://bugsense-backend-s207.onrender.com'
 };

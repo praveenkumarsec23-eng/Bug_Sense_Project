@@ -35,13 +35,19 @@ class LogAnalysisAgent:
 
         inferred_failure = None
 
-        if not exception and code.strip():
+        # Analyze source code even when the exception was already
+        # detected from the error message or stack trace.
+        if code.strip():
             inferred_failure = self._infer_exception_from_source(
                 code=code,
-                language=language
+                language=language,
+                detected_exception=exception,
+                error_message=error_message
             )
 
-            if inferred_failure:
+            # Preserve an exception already detected from the
+            # error message/stack trace.
+            if not exception and inferred_failure:
                 exception = inferred_failure.get("exception")
 
         file_name = self._detect_file(stack_trace)
@@ -60,7 +66,6 @@ class LogAnalysisAgent:
         )
 
         if inferred_failure:
-
             inferred_code = inferred_failure.get("failure_code")
             inferred_line = inferred_failure.get("line")
             inferred_function = inferred_failure.get("function")
@@ -84,14 +89,16 @@ class LogAnalysisAgent:
             "language": language
         }
 
-       # =====================================================
+        # =====================================================
     # SOURCE-CODE EXCEPTION INFERENCE
     # =====================================================
 
     def _infer_exception_from_source(
         self,
         code,
-        language=""
+        language="",
+        detected_exception=None,
+        error_message=""
     ):
         if not code.strip():
             return None
@@ -107,12 +114,13 @@ class LogAnalysisAgent:
         if language_value == "python":
 
             result = self._infer_python_exception(
-                code
+                code=code,
+                detected_exception=detected_exception,
+                error_message=error_message
             )
 
             if result:
                 return result
-
         # -------------------------------------------------
         # JAVA
         # -------------------------------------------------
@@ -1212,10 +1220,247 @@ class LogAnalysisAgent:
 
     def _infer_python_exception(
         self,
-        code
+        code,
+        detected_exception=None,
+        error_message=""
     ):
         lines = code.splitlines()
+        # =====================================================
+        # KEYERROR: LOCATE THE EXACT MISSING DICTIONARY KEY
+        # =====================================================
 
+        if (
+            detected_exception
+            and detected_exception.lower() == "keyerror"
+        ):
+            missing_key = None
+
+            key_match = re.search(
+                r"""KeyError\s*:\s*['"]([^'"]+)['"]""",
+                error_message or "",
+                re.IGNORECASE
+            )
+
+            if key_match:
+                missing_key = key_match.group(1)
+
+            if missing_key:
+                dictionary_access_pattern = re.compile(
+                    r'\b[A-Za-z_]\w*'
+                    r'\s*\[\s*'
+                    r'([\'"])'
+                    + re.escape(missing_key)
+                    + r'\1'
+                    r'\s*\]'
+                )
+
+                for index, line in enumerate(lines):
+                    stripped = line.strip()
+
+                    if not self._is_meaningful_code_line(
+                        stripped
+                    ):
+                        continue
+
+                    if dictionary_access_pattern.search(
+                        stripped
+                    ):
+                        return {
+                            "exception": "KeyError",
+                            "failure_code": stripped,
+                            "line": index + 1,
+                            "function":
+                                self._find_python_function_for_line(
+                                    lines,
+                                    index
+                                ),
+                            "evidence":
+                                (
+                                    f"The missing dictionary key "
+                                    f"'{missing_key}' is accessed "
+                                    "at this statement"
+                                )
+                        }
+        # =====================================================
+        # TYPEERROR: NONE PASSED TO STRING CONCATENATION
+        # =====================================================
+
+        if (
+            detected_exception
+            and detected_exception.lower() == "typeerror"
+            and "nonetype" in (error_message or "").lower()
+        ):
+            none_variables = set()
+
+            none_assignment_pattern = re.compile(
+                r'^\s*'
+                r'([A-Za-z_]\w*)'
+                r'\s*=\s*None\s*$'
+            )
+
+            for line in lines:
+                stripped = line.strip()
+
+                if not self._is_meaningful_code_line(stripped):
+                    continue
+
+                none_match = none_assignment_pattern.match(stripped)
+
+                if none_match:
+                    none_variables.add(none_match.group(1))
+
+            function_pattern = re.compile(
+                r'^\s*def\s+'
+                r'([A-Za-z_]\w*)'
+                r'\s*\(([^)]*)\)\s*:'
+            )
+
+            for function_index, line in enumerate(lines):
+                function_match = function_pattern.match(line)
+
+                if not function_match:
+                    continue
+
+                function_name = function_match.group(1)
+
+                raw_parameters = [
+                    parameter.strip()
+                    for parameter in function_match.group(2).split(",")
+                    if parameter.strip()
+                ]
+
+                parameters = []
+
+                for parameter in raw_parameters:
+                    parameter = parameter.split("=", 1)[0].strip()
+
+                    if ":" in parameter:
+                        parameter = parameter.split(":", 1)[0].strip()
+
+                    if parameter.startswith("**"):
+                        parameter = parameter[2:].strip()
+                    elif parameter.startswith("*"):
+                        parameter = parameter[1:].strip()
+
+                    if re.fullmatch(r'[A-Za-z_]\w*', parameter):
+                        parameters.append(parameter)
+                    else:
+                        parameters.append(None)
+
+                if not parameters:
+                    continue
+
+                function_indent = len(line) - len(line.lstrip())
+                function_end = len(lines)
+
+                for body_index in range(
+                    function_index + 1,
+                    len(lines)
+                ):
+                    body_line = lines[body_index]
+
+                    if not body_line.strip():
+                        continue
+
+                    body_indent = (
+                        len(body_line)
+                        - len(body_line.lstrip())
+                    )
+
+                    if body_indent <= function_indent:
+                        function_end = body_index
+                        break
+
+                for parameter_index, parameter in enumerate(
+                    parameters
+                ):
+                    if not parameter:
+                        continue
+
+                    failure = None
+
+                    string_left_concat_pattern = re.compile(
+                        r'''(?:[rubfRUBF]{0,2})?'''
+                        r'''(?:"[^"\n]*"|'[^'\n]*')'''
+                        r'''\s*\+\s*'''
+                        + rf'''\b{re.escape(parameter)}\b'''
+                    )
+
+                    string_right_concat_pattern = re.compile(
+                        rf'''\b{re.escape(parameter)}\b'''
+                        r'''\s*\+\s*'''
+                        r'''(?:[rubfRUBF]{0,2})?'''
+                        r'''(?:"[^"\n]*"|'[^'\n]*')'''
+                    )
+
+                    for body_index in range(
+                        function_index + 1,
+                        function_end
+                    ):
+                        stripped = lines[body_index].strip()
+
+                        if not self._is_meaningful_code_line(
+                            stripped
+                        ):
+                            continue
+
+                        if (
+                            string_left_concat_pattern.search(stripped)
+                            or string_right_concat_pattern.search(stripped)
+                        ):
+                            failure = {
+                                "code": stripped,
+                                "line": body_index + 1
+                            }
+                            break
+
+                    if not failure:
+                        continue
+
+                    call_pattern = re.compile(
+                        rf'\b{re.escape(function_name)}'
+                        r'\s*\(([^)]*)\)'
+                    )
+
+                    for call_index, call_line in enumerate(lines):
+                        if (
+                            function_index
+                            <= call_index
+                            < function_end
+                        ):
+                            continue
+
+                        for call_match in call_pattern.finditer(
+                            call_line
+                        ):
+                            arguments = [
+                                argument.strip()
+                                for argument
+                                in call_match.group(1).split(",")
+                            ]
+
+                            if parameter_index >= len(arguments):
+                                continue
+
+                            argument = arguments[parameter_index]
+
+                            if (
+                                argument == "None"
+                                or argument in none_variables
+                            ):
+                                return {
+                                    "exception": "TypeError",
+                                    "failure_code": failure["code"],
+                                    "line": failure["line"],
+                                    "function": function_name,
+                                    "evidence":
+                                        (
+                                            f"{function_name}() "
+                                            f"receives None for "
+                                            f"{parameter}, which is "
+                                            "used in string concatenation"
+                                        )
+                                }
         # =====================================================
         # 1. TRACK VARIABLES ASSIGNED A LITERAL ZERO
         # =====================================================
@@ -1253,14 +1498,12 @@ class LogAnalysisAgent:
         )
 
         for index, line in enumerate(lines):
-
             stripped = line.strip()
 
             if not self._is_meaningful_code_line(
                 stripped
             ):
                 continue
-
             # ---------------------------------------------
             # Check whether a known-zero variable is used
             # as a divisor.

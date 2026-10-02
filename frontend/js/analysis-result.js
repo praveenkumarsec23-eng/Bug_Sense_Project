@@ -630,7 +630,7 @@ function showAnalysisResultError() {
       }
 
       details.push(
-        `Semantic similarity: ${confidencePercent}%`
+        `Duplicate confidence: ${confidencePercent}%`
       );
 
       if (analysis.duplicate_reason) {
@@ -1355,61 +1355,126 @@ currentAnalysis = analysis;
       }
     );
   }
-  // =====================================================
-  // MARK AS RESOLVED - SCROLL ISOLATION TEST
-  // =====================================================
+ // =====================================================
+// MARK AS RESOLVED
+// =====================================================
 
-  const markResolvedBtn =
-    document.getElementById(
-      'markResolvedBtn'
-    );
+const markResolvedBtn =
+  document.getElementById('markResolvedBtn');
 
-  if (markResolvedBtn) {
+if (markResolvedBtn) {
 
-    markResolvedBtn.addEventListener(
-      'click',
-      async (event) => {
+  markResolvedBtn.addEventListener(
+    'click',
+    async (event) => {
 
-        event.preventDefault();
-        event.stopPropagation();
+      event.preventDefault();
+      event.stopPropagation();
 
-        if (!currentBugId) {
-          return;
-        }
+      if (!currentBugId) {
+        showToast(
+          'Bug ID is missing.',
+          'error'
+        );
+        return;
+      }
 
-        const token =
-          localStorage.getItem(
-            'bugsense_token'
+      const token =
+        localStorage.getItem('bugsense_token');
+
+      if (!token) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const originalHTML =
+        markResolvedBtn.innerHTML;
+
+      try {
+
+        // Loading state
+        markResolvedBtn.disabled = true;
+
+        markResolvedBtn.innerHTML = `
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true">
+          </span>
+          Resolving...
+        `;
+
+        // Update backend
+        const response =
+          await fetch(
+            `${API_BASE}/api/bugs/${currentBugId}/resolve`,
+            {
+              method: 'POST',
+
+              headers: {
+                'Authorization':
+                  `Bearer ${token}`
+              }
+            }
           );
 
-        if (!token) {
-          return;
-        }
+        let data = {};
 
         try {
-
-          const response =
-            await fetch(
-              `${API_BASE}/api/bugs/${currentBugId}/resolve`,
-              {
-                method: 'POST',
-                headers: {
-                  'Authorization':
-                    `Bearer ${token}`
-                }
-              }
-            );
-
-          await response.json();
-
-        } catch (error) {
-
-          console.error(error);
-
+          data = await response.json();
+        } catch (jsonError) {
+          data = {};
         }
+
+        if (!response.ok) {
+          throw new Error(
+            data.detail ||
+            'Unable to mark bug as resolved.'
+          );
+        }
+
+        // Update local state immediately
+        if (currentBug) {
+          currentBug.status = 'Resolved';
+        }
+
+        // Update status badge immediately
+        updateStatusBadge('Resolved');
+
+        // Update button immediately
+        markResolvedBtn.disabled = true;
+
+        markResolvedBtn.innerHTML =
+          '<i class="bi bi-check2-circle"></i> Resolved';
+
+        // Success message
+        showToast(
+          data.message ||
+          'Bug marked as resolved successfully.',
+          'success'
+        );
+
+      } catch (error) {
+
+        console.error(
+          'Failed to resolve bug:',
+          error
+        );
+
+        // Restore button only when request failed
+        markResolvedBtn.disabled = false;
+        markResolvedBtn.innerHTML =
+          originalHTML;
+
+        showToast(
+          error.message ||
+          'Unable to mark bug as resolved.',
+          'error'
+        );
       }
-    );
-  }
+    }
+  );
+}
   // =====================================================
   // VIEW DETAILS
   // =====================================================
@@ -1982,7 +2047,7 @@ ${escapeReportHtml(
 Result: ${escapeReportHtml(duplicateStatus)}
 Closest Bug: ${escapeReportHtml(matchedBug)}
 Knowledge Entry: ${escapeReportHtml(matchedKnowledge)}
-Semantic Similarity: ${duplicateConfidence}%
+Duplicate Confidence: ${duplicateConfidence}%
 Reason: ${escapeReportHtml(analysis.duplicate_reason)}
       </div>
 
@@ -2106,7 +2171,7 @@ ${escapeReportHtml(analysis.solution)}
       </div>
 
       <div class="summary-item">
-        <span class="label">Semantic Similarity</span>
+       <span class="label">Duplicate Confidence</span>
         <span class="value">
           ${duplicateConfidence}%
         </span>

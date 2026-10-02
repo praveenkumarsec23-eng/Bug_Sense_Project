@@ -115,7 +115,14 @@ class BugAnalysisOrchestrator:
         if detect_duplicates:
             duplicate_result = run_duplicate_agent(
                 similar_bugs=similar_bugs,
-                duplicate_threshold=0.70
+                duplicate_threshold=0.70,
+                title=title,
+                description=description,
+                error_message=error_message,
+                language=language,
+                exception_type=(
+                    log_result["exception"] or ""
+                )
             )
 
         # =================================================
