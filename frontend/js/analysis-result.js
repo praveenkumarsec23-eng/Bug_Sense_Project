@@ -683,52 +683,56 @@ function showAnalysisResultError() {
 
     tableBody.innerHTML = '';
 
-    if (
-      duplicateWasPerformed &&
-      analysis.matched_bug_id &&
-      analysis.matched_knowledge_id
-    ) {
+if (
+  duplicateWasPerformed &&
+  analysis.matched_bug_id &&
+  analysis.matched_knowledge_id
+) {
 
-      const row =
-        document.createElement('tr');
+  const row =
+    document.createElement('tr');
 
-      const matchedKnowledge =
-        analysis.matched_knowledge || {};
+  const matchedKnowledge =
+    analysis.matched_knowledge || {};
 
-      const matchedTitle =
-        matchedKnowledge.title ||
-        `Knowledge Base Match KB-${analysis.matched_knowledge_id}`;
+  const matchedTitle =
+    matchedKnowledge.title ||
+    `Knowledge Base Match KB-${analysis.matched_knowledge_id}`;
 
-      row.innerHTML = `
-        <td class="mono">
-          BUG-${analysis.matched_bug_id}
-        </td>
+  const matchStatus =
+    analysis.is_duplicate
+      ? 'Duplicate'
+      : 'Related Bug';
 
-        <td>
-          ${matchedTitle}
-        </td>
+  row.innerHTML = `
+    <td class="mono">
+      BUG-${analysis.matched_bug_id}
+    </td>
 
-        <td>
-          ${confidencePercent}%
-        </td>
+    <td>
+      ${matchedTitle}
+    </td>
 
-        <td>
-         <span class="badge-status badge-status--resolved">
-    Related Bug
-</span> 
-        </td>
+    <td>
+      ${confidencePercent}%
+    </td>
 
-        <td class="text-end">
-          <button
-            type="button"
-            class="btn btn-ghost btn-sm"
-            id="viewKnowledgeMatchBtn"
-          >
-            KB-${analysis.matched_knowledge_id}
-          </button>
-        </td>
-      `;
+    <td>
+      <span class="badge-status badge-status--resolved">
+        ${matchStatus}
+      </span>
+    </td>
 
+    <td class="text-end">
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm"
+        id="viewKnowledgeMatchBtn"
+      >
+        KB-${analysis.matched_knowledge_id}
+      </button>
+    </td>
+  `;
       tableBody.appendChild(row);
 
       const viewButton =
