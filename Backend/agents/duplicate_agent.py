@@ -29,6 +29,29 @@ class DuplicateDetectionAgent:
             second
         ).ratio()
 
+    def _contains_signal(self, signal, *candidate_fields):
+        """
+        Check whether an important technical signal from the
+        current bug appears anywhere in the historical knowledge.
+        """
+
+        signal = self._normalize(signal)
+
+        if not signal:
+            return 0.0
+
+        candidate_text = self._normalize(
+            " ".join(
+                str(field or "")
+                for field in candidate_fields
+            )
+        )
+
+        if not candidate_text:
+            return 0.0
+
+        return 1.0 if signal in candidate_text else 0.0
+
     def _calculate_duplicate_score(
         self,
         current_title,
@@ -38,9 +61,9 @@ class DuplicateDetectionAgent:
         current_exception,
         candidate
     ):
-        # ---------------------------------------------
-        # Stable signals for duplicate detection
-        # ---------------------------------------------
+        # -------------------------------------------------
+        # Textual similarity signals
+        # -------------------------------------------------
 
         title_score = self._text_similarity(
             current_title,
@@ -51,6 +74,10 @@ class DuplicateDetectionAgent:
             current_description,
             candidate.get("description", "")
         )
+
+        # -------------------------------------------------
+        # Programming-language signal
+        # -------------------------------------------------
 
         current_language_normalized = self._normalize(
             current_language
@@ -70,27 +97,61 @@ class DuplicateDetectionAgent:
             else 0.0
         )
 
-        # RAG remains useful as an additional signal,
-        # but it is no longer the entire duplicate score.
+        # -------------------------------------------------
+        # Historical technical context
+        #
+        # The Knowledge Base currently stores title,
+        # description, root cause and solution rather than
+        # dedicated exception/error-message columns.
+        # Search those fields for technical signals.
+        # -------------------------------------------------
+
+        candidate_context = (
+            candidate.get("title", ""),
+            candidate.get("description", ""),
+            candidate.get("root_cause", ""),
+            candidate.get("solution", "")
+        )
+
+        exception_score = self._contains_signal(
+            current_exception,
+            *candidate_context
+        )
+
+        error_score = self._contains_signal(
+            current_error_message,
+            *candidate_context
+        )
+
+        # -------------------------------------------------
+        # RAG retrieval score
+        # -------------------------------------------------
+
         rag_score = float(
             candidate.get("similarity", 0.0)
         )
 
-        # Exact title matches are a very strong duplicate signal.
-        if title_score >= 0.98:
-            duplicate_score = (
-                (0.55 * title_score)
-                + (0.20 * description_score)
-                + (0.10 * language_score)
-                + (0.15 * rag_score)
-            )
-        else:
-            duplicate_score = (
-                (0.40 * title_score)
-                + (0.25 * description_score)
-                + (0.10 * language_score)
-                + (0.25 * rag_score)
-            )
+        rag_score = max(
+            0.0,
+            min(rag_score, 1.0)
+        )
+
+        # -------------------------------------------------
+        # Weighted duplicate score
+        #
+        # Technical signals receive meaningful weight so
+        # that the decision is not dominated by broad
+        # Knowledge Base text overlap.
+        # -------------------------------------------------
+
+        duplicate_score = (
+            (0.30 * title_score)
+            + (0.15 * description_score)
+            + (0.10 * language_score)
+            + (0.20 * exception_score)
+            + (0.10 * error_score)
+            + (0.15 * rag_score)
+        )
 
         return min(
             round(duplicate_score, 4),
@@ -205,7 +266,7 @@ class DuplicateDetectionAgent:
                 "title"
             ),
             "reason": reason,
-            "similar_bugs": similar_bugs
+            "similar_bugs": scored_candidates
         }
 
 
