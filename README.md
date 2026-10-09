@@ -165,7 +165,7 @@ Structured Analysis Result
 
 ### Database & Knowledge Layer
 
-- SQLite
+- PostgreSQL
 - Historical defect knowledge base
 - Retrieval-Augmented Generation (RAG) workflow
 
